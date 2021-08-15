@@ -3,7 +3,14 @@ import { STICKER_SIZE } from '../constants';
 const renderControl = (label, step, min, onChange, props) => (
   <label>
     {label}
-    <input type="number" step={step} min={min} onChange={onChange} {...props} />
+    <input
+      className="numberInput"
+      type="number"
+      step={step}
+      min={min}
+      onChange={onChange}
+      {...props}
+    />
   </label>
 );
 

@@ -29,6 +29,10 @@ code {
   column-gap: 8px;
 }
 
+.Controls .numberInput {
+  margin-left: 4px;
+}
+
 .Board {
   position: relative;
   display: flex;

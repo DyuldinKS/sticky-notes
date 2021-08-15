@@ -94,7 +94,8 @@ export const Sticker = ({ sticker, setSticker }) => {
 
   useEffect(() => {
     if (isDragging) {
-      // onMouseUp react event listened on the sticker element doesn't happen when cursor goes out from the element.
+      // if we use onMouseUp handler in jsx the mouseup event doesn't happen, when cursor goes out from the element.
+      // TODO: use global mousedown and mousemove events to be able to move a sticker when cursor is outside.
       const onMouseUp = () => stopDraggingRef.current?.();
       document.addEventListener('mouseup', onMouseUp);
       return () => document.removeEventListener('mouseup', onMouseUp);
@@ -104,13 +105,10 @@ export const Sticker = ({ sticker, setSticker }) => {
   const newStyle = { ...sticker.style, ...styleOverride };
 
   return (
-    <div
-      style={newStyle}
-      className="Sticker"
-      onMouseDown={onMouseDown}
-      {...(isDragging ? { onMouseMove } : null)}
-    >
-      {sticker.id}
+    <div style={newStyle} className="Sticker" {...(isDragging ? { onMouseMove } : null)}>
+      <div className="draggable" onMouseDown={onMouseDown}>
+        {sticker.id}
+      </div>
     </div>
   );
 };

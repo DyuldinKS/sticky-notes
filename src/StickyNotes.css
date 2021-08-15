@@ -5,7 +5,6 @@
   min-width: 1024px;
   min-height: 768px;
   height: 100vh;
-  background-color: #eeeabc;
   padding: 16px;
 }
 
@@ -20,12 +19,21 @@
   position: relative;
   flex-grow: 1;
   margin-top: 16px;
-  background-color: #cceace;
+  background-color: #eaeaea;
   overflow: hidden;
 }
 
 .Sticker {
   position: absolute;
-  border: 1px solid gray;
+  box-shadow: 4px 4px 8px #aaaaaa;
+  background-color: #ececcc;
+  resize: both;
+}
+
+.Sticker .draggable {
+  user-select: none;
+  padding: 4px 8px;
   cursor: grab;
+  color: #7c7c7c;
+  background-color: #dcdcbc;
 }

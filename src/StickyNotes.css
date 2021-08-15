@@ -28,6 +28,7 @@
   box-shadow: 4px 4px 8px #aaaaaa;
   background-color: #ececcc;
   resize: both;
+  overflow: auto;
 }
 
 .Sticker .draggable {

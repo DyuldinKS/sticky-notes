@@ -1,0 +1,31 @@
+.StickyNotes {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  min-width: 1024px;
+  min-height: 768px;
+  height: 100vh;
+  background-color: #eeeabc;
+  padding: 16px;
+}
+
+.Controls {
+  display: grid;
+  grid-auto-flow: column;
+  justify-content: start;
+  column-gap: 8px;
+}
+
+.Stickers {
+  position: relative;
+  flex-grow: 1;
+  margin-top: 16px;
+  background-color: #cceace;
+  overflow: hidden;
+}
+
+.Sticker {
+  position: absolute;
+  border: 1px solid gray;
+  cursor: grab;
+}

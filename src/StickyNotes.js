@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
 import { logger } from './logger';
 import './StickyNotes.css';
 
@@ -7,16 +7,38 @@ export const generateId = (size = 32) =>
     .map(v => v.toString(16).padStart(2, '0'))
     .join('');
 
-const createSticker = ({ width, height, x, y }) => ({
-  id: generateId(6),
-  style: { width: 200, height: 150, left: 0, top: 0 },
-});
+const BOARD_OFFSET = 16;
+const STICKER_SIZE = {
+  minWidth: 200,
+  minHeight: 160,
+};
+
+const castToInterval = (min, max, val) => (val ? Math.max(min, Math.min(max, val)) : min);
+
+const createSticker = ({ width, height, x, y }, board) => {
+  const maxWidth = Math.max(STICKER_SIZE.minWidth, board.width / 4);
+  const maxHeight = Math.max(STICKER_SIZE.minHeight, board.height / 4);
+  const w = castToInterval(STICKER_SIZE.minWidth, maxWidth, width);
+  const h = castToInterval(STICKER_SIZE.minHeight, maxHeight, height);
+  console.log(w, h);
+  return {
+    id: generateId(6),
+    style: {
+      width: w,
+      height: h,
+      left: castToInterval(BOARD_OFFSET, board.width - w - BOARD_OFFSET, x),
+      top: castToInterval(BOARD_OFFSET, board.height - h - BOARD_OFFSET, y),
+    },
+  };
+};
 
 export const StickyNotes = () => {
   const settingsRef = useRef({});
+  const boardRef = useRef();
+
   const updateSettings = key => event => {
     settingsRef.current[key] = event.target.value;
-    console.log(settingsRef);
+    logger.log(settingsRef);
   };
 
   const [stickers, setStickers] = useState({});
@@ -27,27 +49,31 @@ export const StickyNotes = () => {
     [stickers]
   );
   const addSticker = useCallback(() => {
-    setSticker(createSticker(settingsRef.current));
+    const boardDimensions = {
+      width: boardRef.current.clientWidth,
+      height: boardRef.current.clientHeight,
+    };
+    setSticker(createSticker(settingsRef.current, boardDimensions));
   }, [setSticker]);
 
   return (
     <div className="StickyNotes">
       <Controls addSticker={addSticker} updateSettings={updateSettings} />
-      <Stickers stickers={stickers} setSticker={setSticker} />
+      <Board ref={boardRef} stickers={stickers} setSticker={setSticker} />
     </div>
   );
 };
 
-export const Stickers = ({ stickers, setSticker }) => {
+export const Board = forwardRef(function Board({ stickers, setSticker }, ref) {
   logger.log('stickers', stickers);
   return (
-    <div className="Stickers">
+    <div ref={ref} className="Board">
       {Object.values(stickers).map(sticker => (
         <Sticker key={sticker.id} sticker={sticker} setSticker={setSticker} />
       ))}
     </div>
   );
-};
+});
 
 export const usePrevious = (value, initial = null) => {
   const previous = useRef(initial);
@@ -117,11 +143,21 @@ export const Controls = ({ addSticker, updateSettings }) => (
   <div className="Controls">
     <label>
       Width
-      <input type="number" step={10} min={0} onChange={updateSettings('width')} />
+      <input
+        type="number"
+        step={10}
+        min={STICKER_SIZE.minWidth}
+        onChange={updateSettings('width')}
+      />
     </label>
     <label>
       Height
-      <input type="number" step={10} min={0} onChange={updateSettings('height')} />
+      <input
+        type="number"
+        step={10}
+        min={STICKER_SIZE.minHeight}
+        onChange={updateSettings('height')}
+      />
     </label>
     <label>
       X position

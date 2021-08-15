@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { logger } from '../utils';
 
 export const Sticker = ({ sticker, setSticker, dropSticker, isInDropZone }) => {
@@ -7,13 +7,13 @@ export const Sticker = ({ sticker, setSticker, dropSticker, isInDropZone }) => {
   const [styleOverride, setStyleOverride] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
 
-  const onMouseDown = event => {
+  const onMouseDown = useCallback(event => {
     logger.log('start dragging');
     initialPosition.current = { x: event.clientX, y: event.clientY };
     setIsDragging(true);
-  };
+  }, []);
 
-  const onMouseMove = event => {
+  const drag = event => {
     const left = sticker.style.left + (event.clientX - initialPosition.current.x);
     const top = sticker.style.top + (event.clientY - initialPosition.current.y);
     setStyleOverride({ left, top });
@@ -32,28 +32,34 @@ export const Sticker = ({ sticker, setSticker, dropSticker, isInDropZone }) => {
     }
   };
 
-  const stopDraggingRef = useRef();
-  stopDraggingRef.current = stopDragging;
-
   useEffect(() => {
     logger.log('external sticker update:', sticker);
     initialPosition.current = null;
   }, [sticker]);
 
+  // wrapping handlers into the ref allows us use them in the effect below without defining them as dependencies
+  const handlersRef = useRef();
+  handlersRef.current = { stopDragging, drag };
+
   useEffect(() => {
     if (isDragging) {
-      // if we use onMouseUp handler in jsx the mouseup event doesn't happen, when cursor goes out from the element.
-      // TODO: use global mousedown and mousemove events to be able to move a sticker when cursor is outside.
-      const onMouseUp = event => stopDraggingRef.current?.(event);
+      // Can't use onMouseUp, onMouseMove JSX handlers, since when cursor goes out from the element these events aren't fired.
+      const onMouseMove = event => handlersRef.current?.drag(event);
+      const onMouseUp = event => handlersRef.current?.stopDragging(event);
+      document.addEventListener('mousemove', onMouseMove);
       document.addEventListener('mouseup', onMouseUp);
-      return () => document.removeEventListener('mouseup', onMouseUp);
+
+      return () => {
+        document.removeEventListener('mouseup', onMouseUp);
+        document.removeEventListener('mousemove', onMouseMove);
+      };
     }
   }, [isDragging]);
 
   const newStyle = { ...sticker.style, ...styleOverride };
 
   return (
-    <div style={newStyle} className="Sticker" {...(isDragging ? { onMouseMove } : null)}>
+    <div style={newStyle} className="Sticker">
       <div className="draggable" onMouseDown={onMouseDown}>
         {sticker.id}
       </div>

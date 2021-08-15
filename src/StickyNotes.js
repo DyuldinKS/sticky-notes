@@ -139,34 +139,19 @@ export const Sticker = ({ sticker, setSticker }) => {
   );
 };
 
+const renderControl = (label, step, min, onChange, props) => (
+  <label>
+    {label}
+    <input type="number" step={step} min={min} onChange={onChange} {...props} />
+  </label>
+);
+
 export const Controls = ({ addSticker, updateSettings }) => (
   <div className="Controls">
-    <label>
-      Width
-      <input
-        type="number"
-        step={10}
-        min={STICKER_SIZE.minWidth}
-        onChange={updateSettings('width')}
-      />
-    </label>
-    <label>
-      Height
-      <input
-        type="number"
-        step={10}
-        min={STICKER_SIZE.minHeight}
-        onChange={updateSettings('height')}
-      />
-    </label>
-    <label>
-      X position
-      <input type="number" step={20} min={0} onChange={updateSettings('x')} />
-    </label>
-    <label>
-      Y position
-      <input type="number" step={20} min={0} onChange={updateSettings('y')} />
-    </label>
+    {renderControl('Width', 10, STICKER_SIZE.minWidth, updateSettings('width'))}
+    {renderControl('Height', 10, STICKER_SIZE.minHeight, updateSettings('height'))}
+    {renderControl('X position', 10, 0, updateSettings('x'))}
+    {renderControl('Y position', 10, 0, updateSettings('y'))}
     <button onClick={addSticker}>Create</button>
   </div>
 );

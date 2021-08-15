@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import { StickyNotes } from './StickyNotes';
+import { StickyNotes } from './components/StickyNotes';
 import reportWebVitals from './reportWebVitals';
 
 ReactDOM.render(

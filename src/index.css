@@ -31,6 +31,7 @@ code {
 
 .Board {
   position: relative;
+  display: flex;
   flex-grow: 1;
   margin-top: 16px;
   background-color: #eaeaea;
@@ -45,6 +46,7 @@ code {
   background-color: #ececcc;
   resize: both;
   overflow: auto;
+  z-index: 100;
 }
 
 .Sticker .draggable {
@@ -53,4 +55,16 @@ code {
   cursor: grab;
   color: #7c7c7c;
   background-color: #dcdcbc;
+}
+
+.dropZone {
+  position: relative;
+  align-self: flex-end;
+  text-align: center;
+  width: 100%;
+  height: 100px;
+  line-height: 100px;
+  background-color: #cecece;
+  color: #5c5c5c;
+  z-index: 0;
 }

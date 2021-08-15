@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { logger } from '../utils';
 
-export const Sticker = ({ sticker, setSticker }) => {
+export const Sticker = ({ sticker, setSticker, dropSticker, isInDropZone }) => {
   const initialPosition = useRef(null);
   // Use local position override for being able to trigger root state updates only after dragging.
   const [styleOverride, setStyleOverride] = useState(null);
@@ -19,13 +19,17 @@ export const Sticker = ({ sticker, setSticker }) => {
     setStyleOverride({ left, top });
   };
 
-  const stopDragging = () => {
+  const stopDragging = event => {
     logger.log('stop dragging:', styleOverride);
     setIsDragging(false);
-    setSticker({
-      ...sticker,
-      style: { ...sticker.style, ...styleOverride },
-    });
+    if (isInDropZone(event.clientX, event.clientY)) {
+      dropSticker(sticker.id);
+    } else {
+      setSticker({
+        ...sticker,
+        style: { ...sticker.style, ...styleOverride },
+      });
+    }
   };
 
   const stopDraggingRef = useRef();
@@ -40,7 +44,7 @@ export const Sticker = ({ sticker, setSticker }) => {
     if (isDragging) {
       // if we use onMouseUp handler in jsx the mouseup event doesn't happen, when cursor goes out from the element.
       // TODO: use global mousedown and mousemove events to be able to move a sticker when cursor is outside.
-      const onMouseUp = () => stopDraggingRef.current?.();
+      const onMouseUp = event => stopDraggingRef.current?.(event);
       document.addEventListener('mouseup', onMouseUp);
       return () => document.removeEventListener('mouseup', onMouseUp);
     }

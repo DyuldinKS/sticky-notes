@@ -3,7 +3,7 @@ import { logger } from '../utils';
 
 export const Sticker = ({ sticker, setSticker, dropSticker, isInDropZone }) => {
   const initialPosition = useRef(null);
-  // Use local position override for being able to trigger root state updates only after dragging.
+  // Use local position for being able to trigger root state updates only after dragging.
   const [styleOverride, setStyleOverride] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
 
@@ -20,15 +20,12 @@ export const Sticker = ({ sticker, setSticker, dropSticker, isInDropZone }) => {
   };
 
   const stopDragging = event => {
-    logger.log('stop dragging:', styleOverride);
+    logger.log('stop dragging:', sticker.id, styleOverride);
     setIsDragging(false);
     if (isInDropZone(event.clientX, event.clientY)) {
       dropSticker(sticker.id);
     } else {
-      setSticker({
-        ...sticker,
-        style: { ...sticker.style, ...styleOverride },
-      });
+      setSticker({ ...sticker, style: newStyle });
     }
   };
 

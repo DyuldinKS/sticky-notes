@@ -47,11 +47,13 @@ export const StickyNotes = () => {
       height: boardRef.current.clientHeight,
     };
     const newSticker = createSticker(settingsRef.current, boardDimensions);
+    logger.log('add sticker:', newSticker);
     setSticker(newSticker);
   }, [setSticker]);
 
   const dropSticker = useCallback(
     id => {
+      logger.log('drop sticker:', id);
       const { [id]: stickerToDrop, ...rest } = stickers;
       setStickers(rest);
     },

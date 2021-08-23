@@ -4,7 +4,7 @@ import { fitIntoInterval, generateId, logger } from '../utils';
 import { Board } from './Board';
 import { Controls } from './Controls';
 
-const createSticker = ({ width, height, x, y }, board) => {
+const createSticker = ({ width, height, x, y }, board, customStyle) => {
   const maxWidth = Math.max(STICKER_SIZE.minWidth, board.width / 4);
   const maxHeight = Math.max(STICKER_SIZE.minHeight, board.height / 4);
   const w = fitIntoInterval(STICKER_SIZE.minWidth, maxWidth, width);
@@ -12,7 +12,8 @@ const createSticker = ({ width, height, x, y }, board) => {
 
   return {
     id: generateId(6),
-    style: {
+    clickedAt: Date.now(),
+    style: customStyle || {
       width: w,
       height: h,
       left: fitIntoInterval(BOARD_OFFSET, board.width - w - BOARD_OFFSET, x),
@@ -41,15 +42,23 @@ export const StickyNotes = () => {
     [stickers]
   );
 
-  const addSticker = useCallback(() => {
-    const boardDimensions = {
-      width: boardRef.current.clientWidth,
-      height: boardRef.current.clientHeight,
-    };
-    const newSticker = createSticker(settingsRef.current, boardDimensions);
-    logger.log('add sticker:', newSticker);
-    setSticker(newSticker);
-  }, [setSticker]);
+  const addSticker = useCallback(
+    (w, h, x, y) => {
+      const boardDimensions = {
+        width: boardRef.current.clientWidth,
+        height: boardRef.current.clientHeight,
+      };
+      const newSticker = createSticker(settingsRef.current, boardDimensions, {
+        width: w,
+        height: h,
+        left: x,
+        top: y,
+      });
+      logger.log('add sticker:', newSticker);
+      setSticker(newSticker);
+    },
+    [setSticker]
+  );
 
   const dropSticker = useCallback(
     id => {
@@ -63,7 +72,13 @@ export const StickyNotes = () => {
   return (
     <div className="StickyNotes">
       <Controls addSticker={addSticker} updateSettings={updateSettings} />
-      <Board ref={boardRef} stickers={stickers} setSticker={setSticker} dropSticker={dropSticker} />
+      <Board
+        ref={boardRef}
+        stickers={stickers}
+        setSticker={setSticker}
+        dropSticker={dropSticker}
+        addSticker={addSticker}
+      />
     </div>
   );
 };

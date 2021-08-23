@@ -72,3 +72,12 @@ code {
   color: #5c5c5c;
   z-index: 0;
 }
+
+.dropZone.active {
+  background-color: #aaaaee;
+}
+
+.new-sticker {
+  position: absolute;
+  background-color: #aaaaee;
+}

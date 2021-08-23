@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { logger } from '../utils';
 
-export const Sticker = ({ sticker, setSticker, dropSticker, isInDropZone }) => {
+export const Sticker = ({ sticker, onDragStop, setSticker, onMove }) => {
   const initialPosition = useRef(null);
   // Use local position for being able to trigger root state updates only after dragging.
   const [styleOverride, setStyleOverride] = useState(null);
@@ -17,22 +17,18 @@ export const Sticker = ({ sticker, setSticker, dropSticker, isInDropZone }) => {
     const left = sticker.style.left + (event.clientX - initialPosition.current.x);
     const top = sticker.style.top + (event.clientY - initialPosition.current.y);
     setStyleOverride({ left, top });
+    onMove(event.clientX, event.clientY);
   };
 
   const stopDragging = event => {
     logger.log('stop dragging:', sticker.id, styleOverride);
     setIsDragging(false);
-    if (isInDropZone(event.clientX, event.clientY)) {
-      dropSticker(sticker.id);
-    } else {
-      setSticker({ ...sticker, style: newStyle });
-    }
+    onDragStop(sticker.id, event.clientX, event.clientY, newStyle);
   };
 
   useEffect(() => {
-    logger.log('external sticker update:', sticker);
     initialPosition.current = null;
-  }, [sticker]);
+  }, [sticker.style]);
 
   // wrapping handlers into the ref allows us use them in the effect below without defining them as dependencies
   const handlersRef = useRef();
@@ -53,10 +49,14 @@ export const Sticker = ({ sticker, setSticker, dropSticker, isInDropZone }) => {
     }
   }, [isDragging]);
 
+  const moveUp = () => {
+    setSticker({ ...sticker, clickedAt: Date.now() });
+  };
+
   const newStyle = { ...sticker.style, ...styleOverride };
 
   return (
-    <div style={newStyle} className="Sticker">
+    <div onMouseDown={moveUp} style={newStyle} className="Sticker">
       <div className="draggable" onMouseDown={onMouseDown}>
         {sticker.id}
       </div>

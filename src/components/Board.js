@@ -45,6 +45,8 @@ export const Board = forwardRef(function Board(
   };
 
   const startCreatingSticker = event => {
+    if (event.target !== ref.current) return;
+
     const position = { x: event.clientX, y: event.clientY };
     setCreatingSticker(position);
     setCursorPosition(position);

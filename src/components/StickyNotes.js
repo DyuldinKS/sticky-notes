@@ -43,17 +43,12 @@ export const StickyNotes = () => {
   );
 
   const addSticker = useCallback(
-    (w, h, x, y) => {
+    style => {
       const boardDimensions = {
         width: boardRef.current.clientWidth,
         height: boardRef.current.clientHeight,
       };
-      const newSticker = createSticker(settingsRef.current, boardDimensions, {
-        width: w,
-        height: h,
-        left: x,
-        top: y,
-      });
+      const newSticker = createSticker(settingsRef.current, boardDimensions, style);
       logger.log('add sticker:', newSticker);
       setSticker(newSticker);
     },

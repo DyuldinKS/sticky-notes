@@ -10,6 +10,17 @@ export const Board = forwardRef(function Board(
   const [isItemInDropZone, setIsItemInDropZone] = useState(false);
   const [cursorPosition, setCursorPosition] = useState(null);
 
+  const rect = ref.current?.getBoundingClientRect();
+  const showStickerCreation = cursorPosition && creatingSticker;
+
+  const newStickerStyleRef = useRef();
+  newStickerStyleRef.current = showStickerCreation && {
+    top: Math.min(creatingSticker.y, cursorPosition.y) - rect.top,
+    left: Math.min(creatingSticker.x, cursorPosition.x) - rect.left,
+    width: Math.abs(cursorPosition.x - creatingSticker.x),
+    height: Math.abs(cursorPosition.y - creatingSticker.y),
+  };
+
   const isInDropZone = useCallback((x, y) => {
     if (!dropZoneRef.current) return false;
 
@@ -34,41 +45,33 @@ export const Board = forwardRef(function Board(
   };
 
   const startCreatingSticker = event => {
-    setCreatingSticker({ x: event.clientX, y: event.clientY });
+    const position = { x: event.clientX, y: event.clientY };
+    setCreatingSticker(position);
+    setCursorPosition(position);
   };
 
-  const stopCreatingSticker = event => {
-    addSticker(
-      Math.abs(event.clientX - creatingSticker.x),
-      Math.abs(event.clientY - creatingSticker.y),
-      Math.min(creatingSticker.x, cursorPosition.x) - rect.left,
-      Math.min(creatingSticker.y, cursorPosition.y) - rect.top
-    );
+  const stopCreatingSticker = useCallback(() => {
+    const styles = newStickerStyleRef.current;
     setCreatingSticker(null);
     setCursorPosition(null);
-  };
-  const stopCbRef = useRef();
-  stopCbRef.current = stopCreatingSticker;
+    addSticker(styles);
+  }, [setCreatingSticker, setCursorPosition, addSticker]);
 
-  const continueCreatingSticker = event => {
+  const continueCreatingSticker = useCallback(event => {
     setCursorPosition({ x: event.clientX, y: event.clientY });
-  };
+  }, []);
 
   useEffect(() => {
     if (creatingSticker) {
-      const stop = event => stopCbRef.current(event);
-      // Can't use onMouseUp, onMouseMove JSX handlers, since when cursor goes out from the element these events aren't fired.
-      document.addEventListener('mouseup', stop);
+      document.addEventListener('mouseup', stopCreatingSticker);
       document.addEventListener('mousemove', continueCreatingSticker);
 
       return () => {
-        document.removeEventListener('mouseup', stop);
-        document.addEventListener('mousemove', continueCreatingSticker);
+        document.removeEventListener('mouseup', stopCreatingSticker);
+        document.removeEventListener('mousemove', continueCreatingSticker);
       };
     }
-  }, [creatingSticker]);
-
-  const rect = ref.current?.getBoundingClientRect();
+  }, [creatingSticker, stopCreatingSticker, continueCreatingSticker]);
 
   return (
     <div ref={ref} className="Board" onMouseDown={startCreatingSticker}>
@@ -83,16 +86,8 @@ export const Board = forwardRef(function Board(
             onMove={onMove}
           />
         ))}
-      {cursorPosition && creatingSticker && (
-        <div
-          className="new-sticker"
-          style={{
-            top: Math.min(creatingSticker.y, cursorPosition.y) - rect.top,
-            left: Math.min(creatingSticker.x, cursorPosition.x) - rect.left,
-            width: Math.abs(cursorPosition.x - creatingSticker.x),
-            height: Math.abs(cursorPosition.y - creatingSticker.y),
-          }}
-        ></div>
+      {showStickerCreation && (
+        <div className="new-sticker" style={newStickerStyleRef.current}></div>
       )}
       <div ref={dropZoneRef} className={'dropZone' + (isItemInDropZone ? ' active' : '')}>
         Drop zone

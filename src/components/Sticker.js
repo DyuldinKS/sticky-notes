@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { logger } from '../utils';
 
-export const Sticker = ({ sticker, onDragStop, setSticker, onMove }) => {
+export const Sticker = memo(({ sticker, onDragStop, setSticker, onMove }) => {
   const initialPosition = useRef(null);
   // Use local position for being able to trigger root state updates only after dragging.
   const [styleOverride, setStyleOverride] = useState(null);
@@ -62,4 +62,4 @@ export const Sticker = ({ sticker, onDragStop, setSticker, onMove }) => {
       </div>
     </div>
   );
-};
+});

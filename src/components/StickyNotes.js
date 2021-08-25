@@ -35,12 +35,9 @@ export const StickyNotes = () => {
     []
   );
 
-  const setSticker = useCallback(
-    sticker => {
-      setStickers({ ...stickers, [sticker.id]: sticker });
-    },
-    [stickers]
-  );
+  const setSticker = useCallback(sticker => {
+    setStickers(stickers => ({ ...stickers, [sticker.id]: sticker }));
+  }, []);
 
   const addSticker = useCallback(
     style => {
@@ -55,14 +52,13 @@ export const StickyNotes = () => {
     [setSticker]
   );
 
-  const dropSticker = useCallback(
-    id => {
-      logger.log('drop sticker:', id);
+  const dropSticker = useCallback(id => {
+    logger.log('drop sticker:', id);
+    setStickers(stickers => {
       const { [id]: stickerToDrop, ...rest } = stickers;
-      setStickers(rest);
-    },
-    [stickers]
-  );
+      return rest;
+    });
+  }, []);
 
   return (
     <div className="StickyNotes">

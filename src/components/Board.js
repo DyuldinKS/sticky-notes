@@ -37,19 +37,18 @@ export const Board = forwardRef(function Board(
     setCreatingSticker({ x: event.clientX, y: event.clientY });
   };
 
-  const stopCreatingSticker = useCallback(
-    event => {
-      setCreatingSticker(null);
-      setCursorPosition(null);
-      addSticker(
-        Math.abs(event.clientX - creatingSticker.x),
-        Math.abs(event.clientY - creatingSticker.y),
-        creatingSticker.x - rect.left,
-        creatingSticker.y - rect.top
-      );
-    },
-    [creatingSticker, addSticker]
-  );
+  const stopCreatingSticker = event => {
+    addSticker(
+      Math.abs(event.clientX - creatingSticker.x),
+      Math.abs(event.clientY - creatingSticker.y),
+      Math.min(creatingSticker.x, cursorPosition.x) - rect.left,
+      Math.min(creatingSticker.y, cursorPosition.y) - rect.top
+    );
+    setCreatingSticker(null);
+    setCursorPosition(null);
+  };
+  const stopCbRef = useRef();
+  stopCbRef.current = stopCreatingSticker;
 
   const continueCreatingSticker = event => {
     setCursorPosition({ x: event.clientX, y: event.clientY });
@@ -57,16 +56,17 @@ export const Board = forwardRef(function Board(
 
   useEffect(() => {
     if (creatingSticker) {
+      const stop = event => stopCbRef.current(event);
       // Can't use onMouseUp, onMouseMove JSX handlers, since when cursor goes out from the element these events aren't fired.
-      document.addEventListener('mouseup', stopCreatingSticker);
+      document.addEventListener('mouseup', stop);
       document.addEventListener('mousemove', continueCreatingSticker);
 
       return () => {
-        document.removeEventListener('mouseup', stopCreatingSticker);
+        document.removeEventListener('mouseup', stop);
         document.addEventListener('mousemove', continueCreatingSticker);
       };
     }
-  }, [creatingSticker, stopCreatingSticker]);
+  }, [creatingSticker]);
 
   const rect = ref.current?.getBoundingClientRect();
 
@@ -87,10 +87,10 @@ export const Board = forwardRef(function Board(
         <div
           className="new-sticker"
           style={{
-            top: creatingSticker.y - rect.top,
-            left: creatingSticker.x - rect.left,
-            width: cursorPosition.x - creatingSticker.x,
-            height: cursorPosition.y - creatingSticker.y,
+            top: Math.min(creatingSticker.y, cursorPosition.y) - rect.top,
+            left: Math.min(creatingSticker.x, cursorPosition.x) - rect.left,
+            width: Math.abs(cursorPosition.x - creatingSticker.x),
+            height: Math.abs(cursorPosition.y - creatingSticker.y),
           }}
         ></div>
       )}

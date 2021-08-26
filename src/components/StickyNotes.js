@@ -1,39 +1,15 @@
-import { useCallback, useRef, useState } from 'react';
-import { BOARD_OFFSET, STICKER_SIZE } from '../constants';
-import { fitIntoInterval, generateId, logger } from '../utils';
+import { useCallback, useState } from 'react';
+import { generateId, logger } from '../utils';
 import { Board } from './Board';
-import { Controls } from './Controls';
 
-const createSticker = ({ width, height, x, y }, board, customStyle) => {
-  const maxWidth = Math.max(STICKER_SIZE.minWidth, board.width / 4);
-  const maxHeight = Math.max(STICKER_SIZE.minHeight, board.height / 4);
-  const w = fitIntoInterval(STICKER_SIZE.minWidth, maxWidth, width);
-  const h = fitIntoInterval(STICKER_SIZE.minHeight, maxHeight, height);
-
-  return {
-    id: generateId(6),
-    clickedAt: Date.now(),
-    style: customStyle || {
-      width: w,
-      height: h,
-      left: fitIntoInterval(BOARD_OFFSET, board.width - w - BOARD_OFFSET, x),
-      top: fitIntoInterval(BOARD_OFFSET, board.height - h - BOARD_OFFSET, y),
-    },
-  };
-};
+const createSticker = style => ({
+  id: generateId(6),
+  clickedAt: Date.now(),
+  style,
+});
 
 export const StickyNotes = () => {
-  const settingsRef = useRef({});
-  const boardRef = useRef();
   const [stickers, setStickers] = useState({});
-
-  const updateSettings = useCallback(
-    key => event => {
-      settingsRef.current[key] = event.target.value;
-      logger.log(settingsRef);
-    },
-    []
-  );
 
   const setSticker = useCallback(sticker => {
     setStickers(stickers => ({ ...stickers, [sticker.id]: sticker }));
@@ -41,11 +17,7 @@ export const StickyNotes = () => {
 
   const addSticker = useCallback(
     style => {
-      const boardDimensions = {
-        width: boardRef.current.clientWidth,
-        height: boardRef.current.clientHeight,
-      };
-      const newSticker = createSticker(settingsRef.current, boardDimensions, style);
+      const newSticker = createSticker(style);
       logger.log('add sticker:', newSticker);
       setSticker(newSticker);
     },
@@ -62,9 +34,7 @@ export const StickyNotes = () => {
 
   return (
     <div className="StickyNotes">
-      <Controls addSticker={addSticker} updateSettings={updateSettings} />
       <Board
-        ref={boardRef}
         stickers={stickers}
         setSticker={setSticker}
         dropSticker={dropSticker}

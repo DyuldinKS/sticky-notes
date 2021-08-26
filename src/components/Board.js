@@ -1,16 +1,14 @@
-import { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Sticker } from './Sticker';
 
-export const Board = forwardRef(function Board(
-  { stickers, setSticker, dropSticker, addSticker },
-  ref
-) {
+export const Board = ({ stickers, setSticker, dropSticker, addSticker }) => {
+  const boardRef = useRef();
   const dropZoneRef = useRef();
   const [creatingSticker, setCreatingSticker] = useState(null);
   const [isItemInDropZone, setIsItemInDropZone] = useState(false);
   const [cursorPosition, setCursorPosition] = useState(null);
 
-  const rect = ref.current?.getBoundingClientRect();
+  const rect = boardRef.current?.getBoundingClientRect();
   const showStickerCreation = cursorPosition && creatingSticker;
 
   const newStickerStyleRef = useRef();
@@ -45,7 +43,7 @@ export const Board = forwardRef(function Board(
   };
 
   const startCreatingSticker = event => {
-    if (event.target !== ref.current) return;
+    if (event.target !== boardRef.current) return;
 
     const position = { x: event.clientX, y: event.clientY };
     setCreatingSticker(position);
@@ -76,7 +74,7 @@ export const Board = forwardRef(function Board(
   }, [creatingSticker, stopCreatingSticker, continueCreatingSticker]);
 
   return (
-    <div ref={ref} className="Board" onMouseDown={startCreatingSticker}>
+    <div ref={boardRef} className="Board" onMouseDown={startCreatingSticker}>
       {Object.values(stickers)
         .sort((a, b) => a.clickedAt - b.clickedAt)
         .map(sticker => (
@@ -96,4 +94,4 @@ export const Board = forwardRef(function Board(
       </div>
     </div>
   );
-});
+};

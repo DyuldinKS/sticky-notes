@@ -31,7 +31,7 @@ export const Board = ({ stickers, setSticker, dropSticker, addSticker }) => {
       dropSticker(id);
       setIsItemInDropZone(false);
     } else {
-      setSticker({ ...stickers[id], options: { ...stickers[id].options, ...newPosition } });
+      setSticker({ ...stickers[id], position: newPosition });
     }
   };
 
@@ -51,10 +51,10 @@ export const Board = ({ stickers, setSticker, dropSticker, addSticker }) => {
   };
 
   const stopCreatingSticker = useCallback(() => {
-    const options = newStickerParamsRef.current;
+    const stickerProps = newStickerParamsRef.current;
     setCreatingSticker(null);
     setCursorPosition(null);
-    addSticker(options);
+    addSticker(stickerProps);
   }, [setCreatingSticker, setCursorPosition, addSticker]);
 
   const continueCreatingSticker = useCallback(event => {

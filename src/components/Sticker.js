@@ -14,8 +14,8 @@ export const Sticker = memo(({ sticker, onDragStop, setSticker, onMove }) => {
   }, []);
 
   const drag = event => {
-    const x = sticker.options.x + (event.clientX - initialPosition.current.x);
-    const y = sticker.options.y + (event.clientY - initialPosition.current.y);
+    const x = sticker.position.x + (event.clientX - initialPosition.current.x);
+    const y = sticker.position.y + (event.clientY - initialPosition.current.y);
     setNewPosition({ x, y });
     onMove(event.clientX, event.clientY);
   };
@@ -28,7 +28,7 @@ export const Sticker = memo(({ sticker, onDragStop, setSticker, onMove }) => {
 
   useEffect(() => {
     initialPosition.current = null;
-  }, [sticker.options]);
+  }, [sticker.position]);
 
   // wrapping handlers into the ref allows us use them in the effect below without defining them as dependencies
   const handlersRef = useRef();
@@ -54,10 +54,10 @@ export const Sticker = memo(({ sticker, onDragStop, setSticker, onMove }) => {
   };
 
   const style = {
-    left: newPosition?.x ?? sticker.options.x,
-    top: newPosition?.y ?? sticker.options.y,
-    width: sticker.options.width,
-    height: sticker.options.height,
+    left: newPosition?.x ?? sticker.position.x,
+    top: newPosition?.y ?? sticker.position.y,
+    width: sticker.size.width,
+    height: sticker.size.height,
   };
 
   return (

@@ -5,7 +5,8 @@ import { Board } from './Board';
 const createSticker = ({ x, y, width, height }) => ({
   id: generateId(6),
   clickedAt: Date.now(),
-  options: { x, y, width, height },
+  position: { x, y },
+  size: { width, height },
 });
 
 export const StickyNotes = () => {
@@ -16,8 +17,8 @@ export const StickyNotes = () => {
   }, []);
 
   const addSticker = useCallback(
-    options => {
-      const newSticker = createSticker(options);
+    stickerProps => {
+      const newSticker = createSticker(stickerProps);
       logger.log('add sticker:', newSticker);
       setSticker(newSticker);
     },

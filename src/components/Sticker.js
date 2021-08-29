@@ -4,7 +4,7 @@ import { logger } from '../utils';
 export const Sticker = memo(({ sticker, onDragStop, setSticker, onMove }) => {
   const initialPosition = useRef(null);
   // Use local position for being able to trigger root state updates only after dragging.
-  const [styleOverride, setStyleOverride] = useState(null);
+  const [newPosition, setNewPosition] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
 
   const onMouseDown = useCallback(event => {
@@ -14,21 +14,21 @@ export const Sticker = memo(({ sticker, onDragStop, setSticker, onMove }) => {
   }, []);
 
   const drag = event => {
-    const left = sticker.style.left + (event.clientX - initialPosition.current.x);
-    const top = sticker.style.top + (event.clientY - initialPosition.current.y);
-    setStyleOverride({ left, top });
+    const x = sticker.options.x + (event.clientX - initialPosition.current.x);
+    const y = sticker.options.y + (event.clientY - initialPosition.current.y);
+    setNewPosition({ x, y });
     onMove(event.clientX, event.clientY);
   };
 
   const stopDragging = event => {
-    logger.log('stop dragging:', sticker.id, styleOverride);
+    logger.log('stop dragging:', sticker.id, newPosition);
     setIsDragging(false);
-    onDragStop(sticker.id, event.clientX, event.clientY, newStyle);
+    onDragStop(sticker.id, event.clientX, event.clientY, newPosition);
   };
 
   useEffect(() => {
     initialPosition.current = null;
-  }, [sticker.style]);
+  }, [sticker.options]);
 
   // wrapping handlers into the ref allows us use them in the effect below without defining them as dependencies
   const handlersRef = useRef();
@@ -53,10 +53,15 @@ export const Sticker = memo(({ sticker, onDragStop, setSticker, onMove }) => {
     setSticker({ ...sticker, clickedAt: Date.now() });
   };
 
-  const newStyle = { ...sticker.style, ...styleOverride };
+  const style = {
+    left: newPosition?.x ?? sticker.options.x,
+    top: newPosition?.y ?? sticker.options.y,
+    width: sticker.options.width,
+    height: sticker.options.height,
+  };
 
   return (
-    <div onMouseDown={moveUp} style={newStyle} className="Sticker">
+    <div onMouseDown={moveUp} style={style} className="Sticker">
       <div className="draggable" onMouseDown={onMouseDown}>
         {sticker.id}
       </div>

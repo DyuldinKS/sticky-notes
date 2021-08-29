@@ -2,10 +2,10 @@ import { useCallback, useState } from 'react';
 import { generateId, logger } from '../utils';
 import { Board } from './Board';
 
-const createSticker = style => ({
+const createSticker = ({ x, y, width, height }) => ({
   id: generateId(6),
   clickedAt: Date.now(),
-  style,
+  options: { x, y, width, height },
 });
 
 export const StickyNotes = () => {
@@ -16,8 +16,8 @@ export const StickyNotes = () => {
   }, []);
 
   const addSticker = useCallback(
-    style => {
-      const newSticker = createSticker(style);
+    options => {
+      const newSticker = createSticker(options);
       logger.log('add sticker:', newSticker);
       setSticker(newSticker);
     },
@@ -25,8 +25,8 @@ export const StickyNotes = () => {
   );
 
   const dropSticker = useCallback(id => {
-    logger.log('drop sticker:', id);
     setStickers(stickers => {
+      logger.log('drop sticker:', id);
       const { [id]: stickerToDrop, ...rest } = stickers;
       return rest;
     });

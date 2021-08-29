@@ -11,10 +11,10 @@ export const Board = ({ stickers, setSticker, dropSticker, addSticker }) => {
   const rect = boardRef.current?.getBoundingClientRect();
   const showStickerCreation = cursorPosition && creatingSticker;
 
-  const newStickerStyleRef = useRef();
-  newStickerStyleRef.current = showStickerCreation && {
-    top: Math.min(creatingSticker.y, cursorPosition.y) - rect.top,
-    left: Math.min(creatingSticker.x, cursorPosition.x) - rect.left,
+  const newStickerParamsRef = useRef();
+  newStickerParamsRef.current = showStickerCreation && {
+    x: Math.min(creatingSticker.x, cursorPosition.x) - rect.left,
+    y: Math.min(creatingSticker.y, cursorPosition.y) - rect.top,
     width: Math.abs(cursorPosition.x - creatingSticker.x),
     height: Math.abs(cursorPosition.y - creatingSticker.y),
   };
@@ -26,12 +26,12 @@ export const Board = ({ stickers, setSticker, dropSticker, addSticker }) => {
     return rect.left <= x && x <= rect.right && rect.top <= y && y <= rect.bottom;
   }, []);
 
-  const onDragStop = (id, x, y, newStyle) => {
+  const onDragStop = (id, x, y, newPosition) => {
     if (isInDropZone(x, y)) {
       dropSticker(id);
       setIsItemInDropZone(false);
     } else {
-      setSticker({ ...stickers[id], style: newStyle });
+      setSticker({ ...stickers[id], options: { ...stickers[id].options, ...newPosition } });
     }
   };
 
@@ -51,10 +51,10 @@ export const Board = ({ stickers, setSticker, dropSticker, addSticker }) => {
   };
 
   const stopCreatingSticker = useCallback(() => {
-    const styles = newStickerStyleRef.current;
+    const options = newStickerParamsRef.current;
     setCreatingSticker(null);
     setCursorPosition(null);
-    addSticker(styles);
+    addSticker(options);
   }, [setCreatingSticker, setCursorPosition, addSticker]);
 
   const continueCreatingSticker = useCallback(event => {
@@ -87,7 +87,15 @@ export const Board = ({ stickers, setSticker, dropSticker, addSticker }) => {
           />
         ))}
       {showStickerCreation && (
-        <div className="new-sticker" style={newStickerStyleRef.current}></div>
+        <div
+          className="new-sticker"
+          style={{
+            left: newStickerParamsRef.current.x,
+            top: newStickerParamsRef.current.y,
+            width: newStickerParamsRef.current.width,
+            height: newStickerParamsRef.current.height,
+          }}
+        ></div>
       )}
       <div ref={dropZoneRef} className={'dropZone' + (isItemInDropZone ? ' active' : '')}>
         Drop zone

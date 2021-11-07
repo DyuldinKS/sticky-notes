@@ -32,11 +32,8 @@ code {
 
 .Sticker {
   position: absolute;
-  min-width: 160px;
-  min-height: 160px;
   box-shadow: 4px 4px 8px #aaaaaa;
   background-color: #ececcc;
-  resize: both;
   overflow: auto;
   z-index: 100;
 }

@@ -21,6 +21,7 @@ export const StickyNotes = () => {
       const newSticker = createSticker(stickerProps);
       logger.log('add sticker:', newSticker);
       setSticker(newSticker);
+      return newSticker;
     },
     [setSticker]
   );

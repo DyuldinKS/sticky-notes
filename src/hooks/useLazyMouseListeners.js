@@ -3,24 +3,19 @@ import { useEffect, useRef } from 'react';
 export const useLazyMouseListeners = (resizing, dragging) => {
   const handlersRef = useRef(null);
 
-  if (resizing.inProgress) {
-    handlersRef.current = { onStop: resizing.stop, onMove: resizing.goOn };
-  } else if (dragging.inProgress) {
-    handlersRef.current = { onStop: dragging.stop, onMove: dragging.goOn };
-  } else {
-    handlersRef.current = null;
-  }
+  handlersRef.current =
+    (resizing.inProgress && resizing) || (dragging.inProgress && dragging) || null;
 
   useEffect(() => {
     if (!handlersRef.current) return;
 
-    const { onStop, onMove } = handlersRef.current;
-    document.addEventListener('mouseup', onStop);
-    document.addEventListener('mousemove', onMove);
+    const { goOn, stop } = handlersRef.current;
+    document.addEventListener('mouseup', stop);
+    document.addEventListener('mousemove', goOn);
 
     return () => {
-      document.removeEventListener('mouseup', onStop);
-      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', stop);
+      document.removeEventListener('mousemove', goOn);
     };
   }, [handlersRef.current]);
 };

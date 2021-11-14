@@ -1,7 +1,6 @@
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
-import { logger } from '../utils';
+import { memo } from 'react';
 
-export const Sticker = memo(({ sticker, startMoving, bringToFore }) => {
+export const Sticker = memo(({ sticker, startDragging, bringToFore }) => {
   const style = {
     left: sticker.position.x,
     top: sticker.position.y,
@@ -11,7 +10,7 @@ export const Sticker = memo(({ sticker, startMoving, bringToFore }) => {
 
   return (
     <div onMouseDown={() => bringToFore(sticker.id)} style={style} className="Sticker">
-      <div className="draggable" onMouseDown={e => startMoving(sticker.id, e.clientX, e.clientY)}>
+      <div className="draggable" onMouseDown={e => startDragging(sticker.id, e.clientX, e.clientY)}>
         {sticker.id}
       </div>
     </div>

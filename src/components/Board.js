@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useCallback, useRef } from 'react';
 import { Sticker } from './Sticker';
 import { useDragging, useDropZone, useLazyMouseListeners, useResizing } from '../hooks';
 
@@ -13,7 +13,7 @@ export const Board = ({ stickers, setSticker, dropSticker, addSticker }) => {
 
   useLazyMouseListeners(resizing, dragging);
 
-  const createSticker = event => {
+  const createSticker = useCallback(event => {
     if (event.target !== boardRef.current) return;
 
     const x = event.clientX;
@@ -21,11 +21,14 @@ export const Board = ({ stickers, setSticker, dropSticker, addSticker }) => {
     const newSticker = addSticker({ x, y, width: 0, height: 0 });
 
     resizing.start(newSticker);
-  };
+  }, []);
 
-  const bringToFore = id => {
-    setSticker({ ...stickers[id], clickedAt: Date.now() });
-  };
+  const bringToFore = useCallback(
+    sticker => {
+      setSticker({ ...sticker, clickedAt: Date.now() });
+    },
+    [setSticker]
+  );
 
   return (
     <div ref={boardRef} className="Board" onMouseDown={createSticker}>
@@ -36,6 +39,7 @@ export const Board = ({ stickers, setSticker, dropSticker, addSticker }) => {
             key={sticker.id}
             sticker={sticker}
             startDragging={dragging.start}
+            startResizing={resizing.start}
             bringToFore={bringToFore}
           />
         ))}

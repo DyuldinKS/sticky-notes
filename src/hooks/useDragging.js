@@ -1,15 +1,15 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 
 export const useDragging = (boardRect, stickers, setSticker, dropSticker, dropZoneState) => {
   const [state, setState] = useState(null);
-  const start = (id, x, y) => {
-    const sticker = stickers[id];
+
+  const start = useCallback((sticker, x, y) => {
     const initialDiff = {
       x: sticker.position.x - x,
       y: sticker.position.y - y,
     };
     setState({ initialDiff, sticker });
-  };
+  }, []);
 
   const drag = event => {
     if (!state) return;

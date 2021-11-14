@@ -1,6 +1,6 @@
 import { memo } from 'react';
 
-export const Sticker = memo(({ sticker, startDragging, bringToFore }) => {
+export const Sticker = memo(({ sticker, startDragging, startResizing, bringToFore }) => {
   const style = {
     left: sticker.position.x,
     top: sticker.position.y,
@@ -9,10 +9,11 @@ export const Sticker = memo(({ sticker, startDragging, bringToFore }) => {
   };
 
   return (
-    <div onMouseDown={() => bringToFore(sticker.id)} style={style} className="Sticker">
-      <div className="draggable" onMouseDown={e => startDragging(sticker.id, e.clientX, e.clientY)}>
+    <div onMouseDown={() => bringToFore(sticker)} style={style} className="Sticker">
+      <div className="draggable" onMouseDown={e => startDragging(sticker, e.clientX, e.clientY)}>
         {sticker.id}
       </div>
+      <div onMouseDown={() => startResizing(sticker)} className="resizeCorner"></div>
     </div>
   );
 });
